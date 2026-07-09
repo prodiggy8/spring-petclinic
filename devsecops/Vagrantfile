@@ -1,0 +1,18 @@
+Vagrant.configure("2") do |config|
+  # virtualbox doesn't work with my kernel, had to go with libvirt
+  config.vm.box = "cloud-image/ubuntu-24.04"
+  config.vm.hostname = "petclinic-vm"
+
+  # routed (not isolated nat) so docker containers can reach the vm
+  config.vm.network "private_network", ip: "192.168.56.10",
+    libvirt__forward_mode: "route", libvirt__dhcp_enabled: false
+
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  config.vm.provider :libvirt do |lv|
+    lv.memory = 1536
+    lv.cpus = 2
+  end
+
+  config.vm.provision "shell", inline: "which python3 || (apt-get update && apt-get install -y python3)"
+end

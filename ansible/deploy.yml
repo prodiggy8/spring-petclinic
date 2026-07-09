@@ -1,0 +1,42 @@
+# deploy petclinic as a docker container on the production vm
+- name: deploy petclinic
+  hosts: petclinic
+  become: true
+  vars:
+    registry: "192.168.56.1:5000"
+    image: "192.168.56.1:5000/petclinic:{{ tag }}"
+  tasks:
+    - name: install docker engine
+      apt:
+        name: docker.io
+        update_cache: true
+        state: present
+
+    - name: ensure docker is running
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: trust the local insecure registry
+      copy:
+        dest: /etc/docker/daemon.json
+        content: |
+          { "insecure-registries": ["{{ registry }}"] }
+      register: daemon_conf
+
+    - name: restart docker if registry config changed
+      service:
+        name: docker
+        state: restarted
+      when: daemon_conf.changed
+
+    - name: pull the image
+      command: "docker pull {{ image }}"
+
+    - name: remove old container
+      command: docker rm -f petclinic
+      ignore_errors: true
+
+    - name: run the new container
+      command: "docker run -d --name petclinic -p 8080:8080 {{ image }}"

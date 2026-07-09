@@ -1,0 +1,34 @@
+{
+  "uid": "jenkins-overview",
+  "title": "Jenkins Overview",
+  "tags": ["jenkins"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 3,
+  "refresh": "15s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1, "type": "stat", "title": "Jenkins Up",
+      "gridPos": { "h": 5, "w": 8, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "mappings": [
+        { "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }
+      ] }, "overrides": [] },
+      "targets": [ { "expr": "default_jenkins_up", "refId": "A" } ]
+    },
+    {
+      "id": 2, "type": "stat", "title": "Build Queue Size",
+      "gridPos": { "h": 5, "w": 8, "x": 8, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [ { "expr": "jenkins_queue_size_value", "refId": "A" } ]
+    },
+    {
+      "id": 3, "type": "timeseries", "title": "JVM Memory Used",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 5 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "bytes" }, "overrides": [] },
+      "targets": [ { "expr": "jvm_memory_bytes_used", "legendFormat": "{{area}}", "refId": "A" } ]
+    }
+  ]
+}
