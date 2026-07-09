@@ -16,7 +16,7 @@ pipeline {
         sh './mvnw -B clean package'
       }
       post {
-        always { junit 'target/surefire-reports/*.xml' }
+        always { junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml' }
       }
     }
 
